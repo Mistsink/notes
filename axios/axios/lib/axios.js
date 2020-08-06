@@ -15,7 +15,7 @@ var defaults = require('./defaults');
 function createInstance(defaultConfig) {
   var context = new Axios(defaultConfig);
   var instance = bind(Axios.prototype.request, context);
-
+  
   // Copy axios.prototype to instance
   utils.extend(instance, Axios.prototype, context);
 
@@ -27,7 +27,7 @@ function createInstance(defaultConfig) {
 
 // Create the default instance to be exported
 var axios = createInstance(defaults);
-
+ 
 // Expose Axios class to allow class inheritance
 axios.Axios = Axios;
 
