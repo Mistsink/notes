@@ -189,6 +189,25 @@
    10. 调用全局的 `afterEach` 钩子。
    11. 触发 DOM 更新。
    12. 用创建好的实例调用 `beforeRouteEnter` 守卫中传给 `next` 的回调函数。
+   
+4. 在自定义路由跳转事件时，触发事件后浏览器会报错：
+   `**Uncaught (in promise) NavigationDuplicated：。。。。**`
+   解决方法：
+        据翻看大佬的解释，`vue-router `≥3.0版本回调形式以及改成`promise api`的形式了，返回的是一个promise，如果没有捕获到错误，控制台始终会出现如图的警告，针对于路由跳转相同的地址，目前的解决方案: `this.$router.push('/location').catch(err => { console.log(err) })`
+
+   ```js
+   
+   import Router from 'vue-router'
+    
+   const originalPush = Router.prototype.push
+   Router.prototype.push = function push(location) {
+     return originalPush.call(this, location).catch(err => err)
+   }
+   ```
+
+   
+
+
 
 
 
@@ -290,4 +309,18 @@
    git remote add your-warehouse-address
    ```
 
-   
+2. git或gitlab修改密码之后，报错remote: HTTP Basic: Access denied，fatal: Authentication failed for ‘git或gitlab地址’：
+   ![image-20200817112455952](C:\Users\Samsara\AppData\Roaming\Typora\typora-user-images\image-20200817112455952.png)
+   方案一：
+
+   - ![image-20200817112517887](C:\Users\Samsara\AppData\Roaming\Typora\typora-user-images\image-20200817112517887.png)
+   - ![image-20200817112538775](C:\Users\Samsara\AppData\Roaming\Typora\typora-user-images\image-20200817112538775.png)
+
+   方案二：
+
+   - ```
+     git config --system --unset credential.helper
+     git config --global credential.helper store
+     ```
+
+     再push就会提示输入用户名和新密码。

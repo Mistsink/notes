@@ -756,7 +756,7 @@ new Animal('Cat').name // 错误: 'name' 是私有的.
 
 TypeScript 使用的是结构性类型系统。 当我们比较两种不同的类型时，并不在乎它们从何处而来，如果所有成员的类型都是兼容的，我们就认为它们的类型是兼容的。
 
-然而，当我们比较带有 `private` 或 `protected` 成员的类型的时候，情况就不同了。 如果其中一个类型里包含一个 `private` 成员，那么只有当另外一个类型中也存在这样一个 `private` 成员，并且它们都是来自同一处声明时，我们才认为这两个类型是兼容的。 对于 `protected` 成员也使用这个规则。
+**然而，当我们比较带有 `private` 或 `protected` 成员的类型的时候，情况就不同了。 如果其中一个类型里包含一个 `private` 成员，那么只有当另外一个类型中也存在这样一个 `private` 成员，并且它们都是来自同一处声明时，我们才认为这两个类型是兼容的。 对于 `protected` 成员也使用这个规则。**
 
 下面来看一个例子，更好地说明了这一点：
 
@@ -935,7 +935,7 @@ if (employee.fullName) {
 
 对于存取器有下面几点需要注意的：
 
-首先，存取器要求你将编译器设置为输出 ECMAScript 5 或更高。 不支持降级到 ECMAScript 3。其次，只带有 `get` 不带有 `set` 的存取器自动被推断为 `readonly`。这在从代码生成 `.d.ts` 文件时是有帮助的，因为利用这个属性的用户会看到不允许够改变它的值。
+首先，存取器要求你将编译器设置为输出 ECMAScript 5 或更高。 不支持降级到 ECMAScript 3。其次，**只带有 `get` 不带有 `set` 的存取器自动被推断为 `readonly`**。这在从代码生成 `.d.ts` 文件时是有帮助的，因为利用这个属性的用户会看到不允许够改变它的值。
 
 ## 静态属性
 
@@ -1096,7 +1096,7 @@ console.log(greeter2.greet())
 
 这个例子里， `greeter1` 与之前看到的一样。 我们实例化 Greeter类，并使用这个对象。 与我们之前看到的一样。
 
-再之后，我们直接使用类。 我们创建了一个叫做 `greeterMaker` 的变量。这个变量保存了这个类或者说保存了类构造函数。 然后我们使用 `typeof Greeter`，意思是取 `Greeter` 类的类型，而不是实例的类型。或者更确切的说，"告诉我 `Greeter` 标识符的类型"，也就是构造函数的类型。 这个类型包含了类的所有静态成员和构造函数。 之后，就和前面一样，我们在 `greeterMaker` 上使用 `new`，创建 `Greeter` 的实例。
+再之后，我们直接使用类。 **我们创建了一个叫做 `greeterMaker` 的变量。这个变量保存了这个类或者说保存了类构造函数。 然后我们使用 `typeof Greeter`，意思是取 `Greeter` 类的类型，而不是实例的类型。或者更确切的说，"告诉我 `Greeter` 标识符的类型"，也就是构造函数的类型。 这个类型包含了类的所有静态成员和构造函数**。 之后，就和前面一样，我们在 `greeterMaker` 上使用 `new`，创建 `Greeter` 的实例。
 
 ### 把类当做接口使用
 
@@ -1114,4 +1114,1135 @@ interface Point3d extends Point {
 
 let point3d: Point3d = {x: 1, y: 2, z: 3}
 ```
+
+
+
+
+
+# 函数
+
+函数是 JavaScript 应用程序的基础，它帮助你实现抽象层，模拟类，信息隐藏和模块。在 TypeScript 里，虽然已经支持类，命名空间和模块，但函数仍然是主要的定义行为的地方。TypeScript 为 JavaScript 函数添加了额外的功能，让我们可以更容易地使用。
+
+## 基本示例
+
+和 JavaScript 一样，TypeScript 函数可以创建有名字的函数和匿名函数。你可以随意选择适合应用程序的方式，不论是定义一系列 API 函数还是只使用一次的函数。
+
+通过下面的例子可以迅速回想起这两种 JavaScript 中的函数：
+
+```javascript
+// 命名函数
+function add(x, y) {
+  return x + y
+}
+
+// 匿名函数
+let myAdd = function(x, y) { 
+  return x + y;
+}
+```
+
+在 JavaScript 里，函数可以使用函数体外部的变量。 当函数这么做时，我们说它‘捕获’了这些变量。 至于为什么可以这样做以及其中的利弊超出了本文的范围，但是深刻理解这个机制对学习 JavaScript 和 TypeScript 会很有帮助。
+
+```javascript
+let z = 100
+
+function addToZ(x, y) {
+  return x + y + z
+}
+```
+
+## 函数类型
+
+### 为函数定义类型
+
+让我们为上面那个函数添加类型：
+
+```typescript
+function add(x: number, y: number): number {
+  return x + y
+}
+
+let myAdd = function(x: number, y: number): number { 
+  return x + y
+}
+```
+
+我们可以给每个参数添加类型之后再为函数本身添加返回值类型。TypeScript 能够根据返回语句自动推断出返回值类型。
+
+### 书写完整函数类型
+
+现在我们已经为函数指定了类型，下面让我们写出函数的完整类型。
+
+```typescript
+let myAdd: (x: number, y: number) => number = 
+function(x: number, y: number): number {
+  return x + y
+}
+
+```
+
+函数类型包含两部分：参数类型和返回值类型。 当写出完整函数类型的时候，这两部分都是需要的。 我们以参数列表的形式写出参数类型，为每个参数指定一个名字和类型。这个名字只是为了增加可读性。 我们也可以这么写：
+
+```typescript
+let myAdd: (baseValue: number, increment: number) => number = 
+function(x: number, y: number): number {
+  return x + y
+}
+```
+
+只要参数类型是匹配的，那么就认为它是有效的函数类型，而不在乎参数名是否正确。
+
+第二部分是返回值类型。 对于返回值，我们在函数和返回值类型之前使用(`=>`)符号，使之清晰明了。 如之前提到的，返回值类型是函数类型的必要部分，如果函数没有返回任何值，你也必须指定返回值类型为 `void` 而不能留空。
+
+函数的类型只是由参数类型和返回值组成的。 函数中使用的捕获变量不会体现在类型里。 实际上，这些变量是函数的隐藏状态并不是组成 API 的一部分。
+
+### 推断类型
+
+尝试这个例子的时候，你会发现如果你在赋值语句的一边指定了类型但是另一边没有类型的话，TypeScript 编译器会自动识别出类型：
+
+```typescript
+let myAdd = function(x: number, y: number): number { 
+  return x + y
+}
+
+let myAdd: (baseValue: number, increment: number) => number = 
+function(x, y) {
+  return x + y
+}
+```
+
+这叫做“按上下文归类”，是类型推论的一种。它帮助我们更好地为程序指定类型。
+
+## 可选参数和默认参数
+
+**TypeScript 里的每个函数参数都是必须的**。 这不是指不能传递 `null` 或 `undefined` 作为参数，而是说编z译器检查用户是否为每个参数都传入了值。编译器还会假设只有这些参数会被传递进函数。 简短地说，传递给一个函数的参数个数必须与函数期望的参数个数一致。
+
+```typescript
+function buildName(firstName: string, lastName: string) {
+    return firstName + ' ' + lastName;
+}
+
+let result1 = buildName('Bob')                  // Error, 参数过少
+let result2 = buildName('Bob', 'Adams', 'Sr.');  // Error, 参数过多
+let result3 = buildName('Bob', 'Adams');         // OK
+```
+
+JavaScript 里，每个参数都是可选的，可传可不传。 没传参的时候，它的值就是 `undefined`。 在TypeScript 里我们可以在参数名旁使用 `?` 实现可选参数的功能。 比如，我们想让 `lastName` 是可选的：
+
+```typescript
+function buildName(firstName: string, lastName?: string): string {
+  if (lastName)
+    return firstName + ' ' + lastName
+  else
+    return firstName
+}
+
+let result1 = buildName('Bob');  // 现在正常了
+let result2 = buildName('Bob', 'Adams', 'Sr.')  // Error, 参数过多
+let result3 = buildName('Bob', 'Adams')  // OK
+```
+
+可选参数必须跟在必须参数后面。 如果上例我们想让 `firstName` 是可选的，那么就必须调整它们的位置，把 `firstName` 放在后面。
+
+在 TypeScript 里，我们也可以为参数提供一个默认值当用户没有传递这个参数或传递的值是 `undefined` 时。 它们叫做有默认初始化值的参数。 让我们修改上例，把`lastName` 的默认值设置为 `"Smith"`。
+
+```typescript
+function buildName(firstName: string, lastName = 'Smith'): string {
+  return firstName + ' ' + lastName
+}
+
+let result1 = buildName('Bob')                  // 返回 "Bob Smith"
+let result2 = buildName('Bob', undefined)     // 正常, 同样 "Bob Smith"
+let result3 = buildName('Bob', 'Adams', 'Sr.')  // 错误, 参数过多
+let result4 = buildName('Bob', 'Adams')        // OK
+```
+
+**与普通可选参数不同的是，带默认值的参数不需要放在必须参数的后面。** 如果带默认值的参数出现在必须参数前面，用户必须明确的传入 `undefined` 值来获得默认值。 例如，我们重写最后一个例子，让 `firstName` 是带默认值的参数：
+
+```typescript
+function buildName(firstName = 'Will', lastName: string): string {
+  return firstName + ' ' + lastName
+}
+
+let result1 = buildName('Bob')                  // Error, 参数过少
+let result2 = buildName('Bob', 'Adams', "Sr.")  // Error, 参数过多
+let result3 = buildName('Bob', 'Adams')         // OK， 返回 "Bob Adams"
+let result4 = buildName(undefined, 'Adams')     // OK，  返回 "Will Adams"
+```
+
+### 剩余参数
+
+必要参数，默认参数和可选参数有个共同点：它们表示某一个参数。 有时，你想同时操作多个参数，或者你并不知道会有多少参数传递进来。 在 JavaScript 里，你可以使用 `arguments` 来访问所有传入的参数。
+
+在 TypeScript 里，你可以把所有参数收集到一个变量里：
+
+```typescript
+function buildName(firstName: string, ...restOfName: string[]): string {
+  return firstName + ' ' + restOfName.join(' ')
+}
+
+let employeeName = buildName('Joseph', 'Samuel', 'Lucas', 'MacKinzie')
+```
+
+剩余参数会被当做个数不限的可选参数。 可以一个都没有，同样也可以有任意个。 编译器创建参数数组，名字是你在省略号（ `...`）后面给定的名字，你可以在函数体内使用这个数组。
+
+这个省略号也会在带有剩余参数的函数类型定义上使用到：
+
+```typescript
+function buildName(firstName: string, ...restOfName: string[]): string {
+  return firstName + ' ' + restOfName.join(' ')
+}
+
+let buildNameFun: (fname: string, ...rest: string[]) => string = buildName
+```
+
+## this
+
+学习如何在 JavaScript 里正确使用 `this` 就好比一场成年礼。由于 TypeScript 是 JavaScript 的超集，TypeScript 程序员也需要弄清 `this` 工作机制并且当有 bug 的时候能够找出错误所在。 幸运的是，TypeScript 能通知你错误地使用了 `this` 的地方。 如果你想了解 JavaScript 里的 this是如何工作的，那么首先阅读 Yehuda Katz 写的 [Understanding JavaScript Function Invocation and "this"](http://yehudakatz.com/2011/08/11/understanding-javascript-function-invocation-and-this/)。 Yehuda 的文章详细的阐述了 `this` 的内部工作原理，因此我们这里只做简单介绍。
+
+### this 和箭头函数
+
+JavaScript里，`this` 的值在函数被调用的时候才会指定。 这是个既强大又灵活的特点，但是你需要花点时间弄清楚函数调用的上下文是什么。但众所周知，这不是一件很简单的事，尤其是在返回一个函数或将函数当做参数传递的时候。
+
+下面看一个例子：
+
+```typescript
+let deck = {
+  suits: ['hearts', 'spades', 'clubs', 'diamonds'],
+  cards: Array(52),
+  createCardPicker: function() {
+    return function() {
+      let pickedCard = Math.floor(Math.random() * 52)
+      let pickedSuit = Math.floor(pickedCard / 13)
+
+      return {suit: this.suits[pickedSuit], card: pickedCard % 13}
+    }
+  }
+}
+
+let cardPicker = deck.createCardPicker()
+let pickedCard = cardPicker()
+
+console.log('card: ' + pickedCard.card + ' of ' + pickedCard.suit)
+```
+
+可以看到 `createCardPicker` 是个函数，并且它又返回了一个函数。如果我们尝试运行这个程序，会发现它并没有输出而是报错了。 因为 `createCardPicker` 返回的函数里的 `this` 被设置成了 `global` 而不是 `deck` 对象。 因为我们只是独立的调用了 `cardPicker()`。 顶级的非方法式调用会将 `this` 视为 `global`。
+
+为了解决这个问题，我们可以在函数被返回时就绑好正确的`this`。 这样的话，无论之后怎么使用它，都会引用绑定的`deck` 对象。 我们需要改变函数表达式来使用 ECMAScript 6 箭头语法。 箭头函数能保存函数创建时的 `this` 值，而不是调用时的值：
+
+```typescript
+let deck = {
+  suits: ['hearts', 'spades', 'clubs', 'diamonds'],
+  cards: Array(52),
+  createCardPicker: function() {
+    // 注意：这里使用箭头函数
+    return () => {
+      let pickedCard = Math.floor(Math.random() * 52)
+      let pickedSuit = Math.floor(pickedCard / 13)
+
+      return {suit: this.suits[pickedSuit], card: pickedCard % 13}
+    }
+  }
+}
+
+let cardPicker = deck.createCardPicker()
+let pickedCard = cardPicker()
+
+console.log('card: ' + pickedCard.card + ' of ' + pickedCard.suit)
+```
+
+### this 参数
+
+在上述的例子中 `this.suits[pickedSuit]` 的类型为 `any`，这是因为 `this` 来自对象字面量里的函数表达式。 修改的方法是，提供一个显式的 `this` 参数。 `this` 参数是个假的参数，它出现在参数列表的最前面：
+
+```typescript
+function f(this: void) {
+  // 确保“this”在此独立函数中不可用
+}
+```
+
+让我们往例子里添加一些接口，`Card` 和 `Deck`，让类型重用能够变得清晰简单些：
+
+```typescript
+interface Card {
+  suit: string
+  card: number
+}
+
+interface Deck {
+  suits: string[]
+  cards: number[]
+
+  createCardPicker (this: Deck): () => Card
+}
+
+let deck: Deck = {
+  suits: ['hearts', 'spades', 'clubs', 'diamonds'],
+  cards: Array(52),
+  // NOTE: 函数现在显式指定其被调用方必须是 deck 类型
+  createCardPicker: function (this: Deck) {
+    return () => {
+      let pickedCard = Math.floor(Math.random() * 52)
+      let pickedSuit = Math.floor(pickedCard / 13)
+
+      return {suit: this.suits[pickedSuit], card: pickedCard % 13}
+    }
+  }
+}
+
+let cardPicker = deck.createCardPicker()
+let pickedCard = cardPicker()
+
+console.log('card: ' + pickedCard.card + ' of ' + pickedCard.suit)
+```
+
+现在 TypeScrip t知道 `createCardPicker` 期望在某个 `Deck` 对象上调用。也就是说 `this` 是 `Deck` 类型的，而非 `any`。
+
+### this 参数在回调函数里
+
+你可以也看到过在回调函数里的 `this` 报错，当你将一个函数传递到某个库函数里稍后会被调用时。 因为当回调被调用的时候，它们会被当成一个普通函数调用，`this` 将为 `undefined`。 稍做改动，你就可以通过 `this` 参数来避免错误。 首先，库函数的作者要指定 `this` 的类型：
+
+```typescript
+interface UIElement {
+  addClickListener(onclick: (this: void, e: Event) => void): void
+}
+```
+
+`this: void` 意味着 `addClickListener` 期望传入的 `onclick` 方法不需要 `this`
+
+```typescript
+interface UIElement {
+  addClickListener (onclick: (this: void, e: Event) => void): void
+}
+
+class Handler {
+  type: string
+
+  onClickBad (this: Handler, e: Event) {
+    this.type = e.type
+  }
+}
+
+let h = new Handler()
+
+let uiElement: UIElement = {
+  addClickListener () {
+  }
+}
+
+uiElement.addClickListener(h.onClickBad) // error!
+
+```
+
+指定了 `this` 类型后，你显式声明 `onClickBad` 必须在 `Handler` 的实例上调用。 然后 TypeScript 会检测到 `addClickListener` 要求函数带有 `this: void`。 改变 `this` 类型来修复这个错误：
+
+```typescript
+class Handler {
+  type: string;
+
+  onClickBad (this: void, e: Event) {
+    console.log('clicked!')
+  }
+}
+
+let h = new Handler()
+
+let uiElement: UIElement = {
+  addClickListener () {
+  }
+}
+
+uiElement.addClickListener(h.onClickBad)
+```
+
+因为 `onClickGood` 指定了 `this` 类型为 `void`，因此传递 `addClickListener` 是合法的。 当然了，这也意味着不能使用 `this.info`。 如果你两者都想要，你不得不使用箭头函数了：
+
+```typescript
+class Handler {
+  type: string
+  onClickGood = (e: Event) => {
+    this.type = e.type 
+  }
+}
+```
+
+这是可行的因为箭头函数不会捕获 `this`，所以你总是可以把它们传给期望 `this: void` 的函数。
+
+## 重载
+
+JavaScript 本身是个动态语言。JavaScript 里函数根据传入不同的参数而返回不同类型的数据的场景是很常见的。
+
+
+```typescript
+let suits = ['hearts', 'spades', 'clubs', 'diamonds']
+
+function pickCard(x): any {
+  if (Array.isArray(x)) {
+    let pickedCard = Math.floor(Math.random() * x.length)
+    return pickedCard
+  } else if (typeof x === 'number') {
+    let pickedSuit = Math.floor(x / 13)
+    return { suit: suits[pickedSuit], card: x % 13 }
+  }
+}
+
+let myDeck = [
+  { suit: 'diamonds', card: 2 },
+  { suit: 'spades', card: 10 },
+  { suit: 'hearts', card: 4 }
+]
+let pickedCard1 = myDeck[pickCard(myDeck)];
+console.log('card: ' + pickedCard1.card + ' of ' + pickedCard1.suit)
+
+let pickedCard2 = pickCard(15)
+console.log('card: ' + pickedCard2.card + ' of ' + pickedCard2.suit)
+```
+
+`pickCard` 方法根据传入参数的不同会返回两种不同的类型。如果传入的是代表纸牌的对象数组，函数作用是从中抓一张牌。如果用户想抓牌，我们告诉他抓到了什么牌。 但是这怎么在类型系统里表示呢。
+
+方法是为同一个函数提供多个函数类型定义来进行函数重载。 编译器会根据这个列表去处理函数的调用。 下面我们来重载 `pickCard` 函数。
+
+
+```typescript
+let suits = ['hearts', 'spades', 'clubs', 'diamonds']
+
+function pickCard(x: {suit: string; card: number }[]): number
+function pickCard(x: number): {suit: string; card: number }
+
+function pickCard(x): any {
+  if (Array.isArray(x)) {
+    let pickedCard = Math.floor(Math.random() * x.length)
+    return pickedCard
+  } else if (typeof x === 'number') {
+    let pickedSuit = Math.floor(x / 13)
+    return { suit: suits[pickedSuit], card: x % 13 }
+  }
+}
+
+let myDeck = [
+  { suit: 'diamonds', card: 2 },
+  { suit: 'spades', card: 10 },
+  { suit: 'hearts', card: 4 }
+]
+let pickedCard1 = myDeck[pickCard(myDeck)];
+console.log('card: ' + pickedCard1.card + ' of ' + pickedCard1.suit)
+
+let pickedCard2 = pickCard(15)
+console.log('card: ' + pickedCard2.card + ' of ' + pickedCard2.suit)
+```
+
+这样改变后，重载的 `pickCard` 函数在调用的时候会进行正确的类型检查。
+
+为了让编译器能够选择正确的检查类型，它与 JavaScript 里的处理流程相似。它查找重载列表，尝试使用第一个重载定义。 如果匹配的话就使用这个。因此，在定义重载的时候，一定要把最精确的定义放在最前面。
+
+注意，`function pickCard(x): any` 并不是重载列表的一部分，因此这里只有两个重载：一个是接收对象数组，另一个接收数字。 以其它参数调用 `pickCard` 会产生错误。
+
+
+
+
+
+# 泛型
+
+软件工程中，我们不仅要创建定义良好且一致的 API，同时也要考虑可重用性。 组件不仅能够支持当前的数据类型，同时也能支持未来的数据类型，这在创建大型系统时为你提供了十分灵活的功能。
+
+在像 C# 和 Java 这样的语言中，可以使用泛型来创建可重用的组件，一个组件可以支持多种类型的数据。 这样用户就可以以自己的数据类型来使用组件。
+
+## 基础示例
+
+下面来创建第一个使用泛型的例子：`identity` 函数。 这个函数会返回任何传入它的值。 你可以把这个函数当成是 `echo` 命令。
+
+不用泛型的话，这个函数可能是下面这样：
+
+```typescript
+function identity(arg: number): number {
+  return arg
+}
+```
+
+或者，我们使用 `any` 类型来定义函数：
+
+```typescript
+function identity(arg: any): any {
+  return arg
+}
+```
+
+使用 `any` 类型会导致这个函数可以接收任何类型的 `arg` 参数，但是这样就丢失了一些信息：传入的类型与返回的类型应该是相同的。如果我们传入一个数字，我们只知道任何类型的值都有可能被返回。
+
+因此，我们需要一种方法使返回值的类型与传入参数的类型是相同的。这里，我们使用了*类型变量*，它是一种特殊的变量，只用于表示类型而不是值。
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+```
+
+我们给 `identity` 添加了类型变量 `T`。 `T` 帮助我们捕获用户传入的类型（比如：`number`），之后我们就可以使用这个类型。 之后我们再次使用了 `T` 当做返回值类型。现在我们可以知道参数类型与返回值类型是相同的了。这允许我们跟踪函数里使用的类型的信息。
+
+我们把这个版本的 `identity` 函数叫做泛型，因为它可以适用于多个类型。 不同于使用 `any`，它不会丢失信息，像第一个例子那像保持准确性，传入数值类型并返回数值类型。
+
+我们定义了泛型函数后，可以用两种方法使用。 第一种是，传入所有的参数，包含类型参数：
+
+```typescript
+let output = identity<string>('myString')
+```
+
+这里我们明确的指定了 `T` 是 `string` 类型，并做为一个参数传给函数，使用了 `<>` 括起来而不是 `()`。
+
+第二种方法更普遍。利用了*类型推论* -- 即编译器会根据传入的参数自动地帮助我们确定 `T` 的类型：
+
+```typescript
+let output = identity('myString')
+```
+
+注意我们没必要使用尖括号（`<>`）来明确地传入类型；编译器可以查看 `myString` 的值，然后把 `T` 设置为它的类型。 类型推论帮助我们保持代码精简和高可读性。如果编译器不能够自动地推断出类型的话，只能像上面那样明确的传入 `T` 的类型，在一些复杂的情况下，这是可能出现的。
+
+## 使用泛型变量
+
+使用泛型创建像 `identity` 这样的泛型函数时，编译器要求你在函数体必须正确的使用这个通用的类型。 换句话说，你必须把这些参数当做是任意或所有类型。
+
+看下之前 `identity` 例子：
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+```
+
+如果我们想打印出 `arg` 的长度。 我们很可能会这样做：
+
+```typescript
+function loggingIdentity<T>(arg: T): T {
+  console.log(arg.length)
+  return arg
+}
+```
+
+如果这么做，编译器会报错说我们使用了 `arg` 的 `.length` 属性，但是没有地方指明 `arg` 具有这个属性。记住，这些类型变量代表的是任意类型，所以使用这个函数的人可能传入的是个数字，而数字是没有 `.length` 属性的。
+
+现在假设我们想操作 `T` 类型的数组而不直接是 `T`。由于我们操作的是数组，所以 `.length` 属性是应该存在的。我们可以像创建其它数组一样创建这个数组：
+
+```typescript
+function loggingIdentity<T>(arg: T[]): T[] {
+  console.log(arg.length)
+  return arg
+}
+```
+
+你可以这样理解 `loggingIdentity` 的类型：泛型函数 `loggingIdentity`，接收类型参数 `T` 和参数 `arg`，它是个元素类型是 `T` 的数组，并返回元素类型是`T` 的数组。 如果我们传入数字数组，将返回一个数字数组，因为此时 `T` 的的类型为 `number`。 这可以让我们把泛型变量 `T` 当做类型的一部分使用，而不是整个类型，增加了灵活性。
+
+
+## 泛型类型
+
+上一节，我们创建了 `identity` 通用函数，可以适用于不同的类型。 在这节，我们研究一下函数本身的类型，以及如何创建泛型接口。
+
+泛型函数的类型与非泛型函数的类型没什么不同，只是有一个类型参数在最前面，像函数声明一样：
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+
+let myIdentity: <T>(arg: T) => T = identity
+```
+
+我们也可以使用不同的泛型参数名，只要在数量上和使用方式上能对应上就可以。
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+
+let myIdentity: <U>(arg: U) => U = identity
+```
+
+我们还可以使用带有调用签名的对象字面量来定义泛型函数：
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+
+let myIdentity: {<T>(arg: T): T} = identity
+```
+
+这引导我们去写第一个泛型接口了。我们把上面例子里的对象字面量拿出来做为一个接口：
+
+```typescript
+interface GenericIdentityFn {
+  <T>(arg: T): T
+}
+
+function identity<T>(arg: T): T {
+  return arg
+}
+
+let myIdentity: GenericIdentityFn = identity
+```
+
+我们甚至可以把泛型参数当作整个接口的一个参数。 这样我们就能清楚的知道使用的具体是哪个泛型类型（比如： `Dictionary<string>` 而不只是` Dictionary`）。这样接口里的其它成员也能知道这个参数的类型了。
+
+
+```typescript
+interface GenericIdentityFn<T> {
+  (arg: T): T
+}
+
+function identity<T>(arg: T): T {
+  return arg
+}
+
+let myIdentity: GenericIdentityFn<number> = identity
+```
+
+注意，我们的示例做了少许改动。 不再描述泛型函数，而是把非泛型函数签名作为泛型类型一部分。 当我们使用 `GenericIdentityFn` 的时候，还得传入一个类型参数来指定泛型类型（这里是：`number`），锁定了之后代码里使用的类型。对于描述哪部分类型属于泛型部分来说，理解何时把参数放在调用签名里和何时放在接口上是很有帮助的。
+
+除了泛型接口，我们还可以创建泛型类。 注意，无法创建泛型枚举和泛型命名空间。
+
+## 泛型类
+
+泛型类看上去与泛型接口差不多。 泛型类使用（ `<>`）括起泛型类型，跟在类名后面。
+
+```typescript
+class GenericNumber<T> {
+  zeroValue: T
+  add: (x: T, y: T) => T
+}
+
+let myGenericNumber = new GenericNumber<number>()
+myGenericNumber.zeroValue = 0
+myGenericNumber.add = function(x, y) {
+  return x + y 
+}
+```
+
+`GenericNumber` 类的使用是十分直观的，并且你可能已经注意到了，没有什么去限制它只能使用 `number` 类型。 也可以使用字符串或其它更复杂的类型。
+
+```typescript
+let stringNumeric = new GenericNumber<string>()
+stringNumeric.zeroValue = ''
+stringNumeric.add = function(x, y) { 
+  return x + y
+}
+
+console.log(stringNumeric.add(stringNumeric.zeroValue, 'test'))
+```
+
+与接口一样，直接把泛型类型放在类后面，可以帮助我们确认类的所有属性都在使用相同的类型。
+
+我们在[类](/chapter2/class)那节说过，类有两部分：静态部分和实例部分。 泛型类指的是实例部分的类型，所以类的静态属性不能使用这个泛型类型。
+
+## 泛型约束
+
+我们有时候想操作某类型的一组值，并且我们知道这组值具有什么样的属性。在 `loggingIdentity` 例子中，我们想访问 `arg` 的 `length` 属性，但是编译器并不能证明每种类型都有 `length` 属性，所以就报错了。
+
+```typescript
+function loggingIdentity<T>(arg: T): T {
+  console.log(arg.length)
+  return arg
+}
+```
+
+相比于操作 `any` 所有类型，我们想要限制函数去处理任意带有 `.length` 属性的所有类型。 只要传入的类型有这个属性，我们就允许，就是说至少包含这一属性。为此，我们需要列出对于 `T` 的约束要求。
+
+我们定义一个接口来描述约束条件，创建一个包含 `.length` 属性的接口，使用这个接口和 `extends` 关键字来实现约束：
+
+```typescript
+interface Lengthwise {
+  length: number
+}
+
+function loggingIdentity<T extends Lengthwise>(arg: T): T {
+  console.log(arg.length) // OK
+  return arg
+}
+```
+
+现在这个泛型函数被定义了约束，因此它不再是适用于任意类型：
+
+```typescript
+loggingIdentity(3);  // Error
+```
+
+我们需要传入符合约束类型的值，必须包含必须的属性：
+
+```typescript
+loggingIdentity({length: 10, value: 3}) // OK
+```
+
+### 在泛型约束中使用类型参数
+
+你可以声明一个类型参数，且它被另一个类型参数所约束。 比如，现在我们想要用属性名从对象里获取这个属性。 并且我们想要确保这个属性存在于对象 `obj` 上，因此我们需要在这两个类型之间使用约束。
+
+```typescript
+function getProperty<T, K extends keyof T> (obj: T, key: K ) {
+  return obj[key]
+}
+
+let x = {a: 1, b: 2, c: 3, d: 4}
+
+getProperty(x, 'a') // okay
+getProperty(x, 'm') // error
+```
+
+
+
+# 类型推断
+
+这节介绍 TypeScript 里的类型推断。即，类型是在哪里如何被推断的。
+
+## 基础
+
+TypeScript 里，在有些没有明确指出类型的地方，类型推断会帮助提供类型。如下面的例子：
+
+```typescript
+let x = 3
+```
+
+变量 `x` 的类型被推断为数字。 这种推断发生在初始化变量和成员，设置默认参数值和决定函数返回值时。
+
+大多数情况下，类型推断是直截了当地。后面的小节，我们会浏览类型推断时的细微差别。
+
+## 最佳通用类型
+
+有些时候我们需要从几个表达式中推断类型，会使用这些表达式的类型来推断出一个最合适的通用类型。例如，
+
+```typescript
+let x = [0, 1, null]
+```
+
+为了推断 `x` 的类型，我们必须考虑所有元素的类型。 这里有两种选择：`number` 和 `null`。 计算通用类型算法会考虑所有的候选类型，并给出一个兼容所有候选类型的类型。
+
+由于最终的通用类型取自候选类型，有些时候候选类型共享一个公共结构，但是却没有一个类型能做为所有候选类型的超级类型。例如：
+
+```typescript
+class Animal {
+  numLegs: number
+}
+
+class Bee extends Animal {
+}
+
+class Lion extends Animal {
+}
+
+let zoo = [new Bee(), new Lion()]
+```
+
+这里，我们想让 `zoo` 被推断为 `Animal[]` 类型，但是这个数组里没有对象是 `Animal` 类型的，因此不能推断出这个结果。 为了更正，我们可以明确的声明我们期望的类型：
+
+```typescript
+let zoo: Animal[] = [new Bee(), new Lion()]
+```
+
+如果没有找到最佳通用类型的话，类型推断的结果为联合数组类型，`(Bee | Lion)[]`
+
+## 上下文类型
+
+有些时候，TypeScript 类型推断会按另外一种方式，我们称作“上下文类型”；上下文类型的出现和表达式的类型以及所处的位置相关。比如：
+
+```typescript
+window.onmousedown = function(mouseEvent) {
+  console.log(mouseEvent.clickTime)  // Error
+}
+```
+
+这个例子会得到一个类型错误，TypeScript 类型检查器使用 `window.onmousedown` 函数的类型来推断右边函数表达式的类型。 因此，就能推断出 `mouseEvent` 参数的类型了，所以 `mouseEvent` 访问了一个不存在的属性，就报错了。
+
+如果上下文类型表达式包含了明确的类型信息，上下文的类型被忽略。重写上面的例子：
+
+```typescript
+window.onmousedown = function(mouseEvent:any) {
+  console.log(mouseEvent.clickTime)  // OK
+}
+```
+
+这个函数表达式有明确的参数类型注解，上下文类型被忽略。这样的话就不报错了，因为这里不会使用到上下文类型。
+
+上下文类型会在很多情况下使用到。通常包含函数的参数，赋值表达式的右边，类型断言，对象成员，数组字面量和返回值语句。上下文类型也会做为最佳通用类型的候选类型。比如：
+
+```typescript
+function createZoo(): Animal[] {
+  return [new Bee(), new Lion()]
+}
+
+let zoo = createZoo()
+```
+
+这个例子里，最佳通用类型有 `3` 个候选者：`Animal`，`Bee` 和 `Lion`。 其中，`Animal` 会被做为最佳通用类型。
+
+
+
+
+
+# 高级类型
+
+## 交叉类型
+
+交叉类型是将多个类型合并为一个类型。 这让我们可以把现有的多种类型叠加到一起成为一种类型，它包含了所需的所有类型的特性。 例如，`Person & Loggable` 同时是 `Person` 和 `Loggable`。 就是说这个类型的对象同时拥有了这两种类型的成员。
+
+我们大多是在混入（mixins）或其它不适合典型面向对象模型的地方看到交叉类型的使用。 （在 JavaScript 里发生这种情况的场合很多！） 下面是如何创建混入的一个简单例子：
+
+```typescript
+function extend<T, U> (first: T, second: U): T & U {
+  let result = {} as T & U
+  for (let id in first) {
+    result[id] = first[id] as any
+  }
+  for (let id in second) {
+    if (!result.hasOwnProperty(id)) {
+      result[id] = second[id] as any
+    }
+  }
+  return result
+}
+
+class Person {
+  constructor (public name: string) {
+  }
+}
+
+interface Loggable {
+  log (): void
+}
+
+class ConsoleLogger implements Loggable {
+  log () {
+    // ...
+  }
+}
+
+var jim = extend(new Person('Jim'), new ConsoleLogger())
+var n = jim.name
+jim.log()
+```
+
+## 联合类型
+
+联合类型与交叉类型很有关联，但是使用上却完全不同。 偶尔你会遇到这种情况，一个代码库希望传入 `number` 或 `string` 类型的参数。 例如下面的函数：
+
+```typescript
+function padLeft(value: string, padding: any) {
+  if (typeof padding === 'number') {
+    return Array(padding + 1).join(' ') + value
+  }
+  if (typeof padding === 'string') {
+    return padding + value
+  }
+  throw new Error(`Expected string or number, got '${padding}'.`)
+}
+
+padLeft('Hello world', 4) // returns "    Hello world"
+
+```
+
+`padLeft` 存在一个问题，`padding` 参数的类型指定成了 `any`。 这就是说我们可以传入一个既不是 `number` 也不是 `string` 类型的参数，但是 TypeScript 却不报错。
+
+```typescript
+let indentedString = padLeft('Hello world', true) // 编译阶段通过，运行时报错
+```
+
+为了解决这个问题，我们可以使用 联合类型做为 `padding` 的参数：
+
+```typescript
+function padLeft(value: string, padding: string | number) {
+  // ...
+}
+
+let indentedString = padLeft('Hello world', true) // 编译阶段报错
+```
+
+联合类型表示一个值可以是几种类型之一。我们用竖线（`|`）分隔每个类型，所以 `number | string` 表示一个值可以是 `number` 或 `string`。
+
+如果一个值是联合类型，我们只能访问此联合类型的所有类型里共有的成员。
+
+```typescript
+interface Bird {
+  fly()
+  layEggs()
+}
+
+interface Fish {
+  swim()
+  layEggs()
+}
+
+function getSmallPet(): Fish | Bird {
+  // ...
+}
+
+let pet = getSmallPet()
+pet.layEggs() // okay
+pet.swim()    // error
+```
+
+这里的联合类型可能有点复杂：如果一个值的类型是 `A | B`，我们能够确定的是它包含了 `A` 和 `B` 中共有的成员。这个例子里，`Fish` 具有一个 `swim` 方法，我们不能确定一个 `Bird | Fish` 类型的变量是否有 `swim`方法。 如果变量在运行时是 `Bird` 类型，那么调用 `pet.swim()` 就出错了。
+
+## 类型保护
+
+联合类型适合于那些值可以为不同类型的情况。 但当我们想确切地了解是否为 `Fish` 或者是 `Bird` 时怎么办？ JavaScript 里常用来区分这 2 个可能值的方法是检查成员是否存在。如之前提及的，我们只能访问联合类型中共同拥有的成员。
+
+```typescript
+let pet = getSmallPet()
+
+// 每一个成员访问都会报错
+if (pet.swim) {
+  pet.swim()
+} else if (pet.fly) {
+  pet.fly()
+}
+```
+
+为了让这段代码工作，我们要使用类型断言：
+
+```typescript
+let pet = getSmallPet()
+
+if ((pet as Fish).swim) {
+  (pet as Fish).swim()
+} else {
+  (pet as Bird).fly()
+}
+```
+
+### 用户自定义的类型保护
+
+这里可以注意到我们不得不多次使用类型断言。如果我们一旦检查过类型，就能在之后的每个分支里清楚地知道 `pet` 的类型的话就好了。
+
+TypeScript 里的*类型保护*机制让它成为了现实。 类型保护就是一些表达式，它们会在运行时检查以确保在某个作用域里的类型。定义一个类型保护，我们只要简单地定义一个函数，它的返回值是一个*类型谓词*：
+
+```typescript
+function isFish(pet: Fish | Bird): pet is Fish {
+  return (pet as Fish).swim !== undefined
+}
+```
+
+在这个例子里，`pet is Fish` 就是类型谓词。谓词为 `parameterName is Type` 这种形式， `parameterName` 必须是来自于当前函数签名里的一个参数名。
+
+每当使用一些变量调用 `isFish` 时，`TypeScript` 会将变量缩减为那个具体的类型。
+
+```typescript
+if (isFish(pet)) {
+  pet.swim()
+}
+else {
+  pet.fly()
+}
+```
+
+注意 `TypeScript` 不仅知道在 `if` 分支里 `pet` 是 `Fish` 类型；它还清楚在 `else` 分支里，一定不是 Fish类型而是 `Bird` 类型。
+
+### typeof 类型保护
+
+现在我们回过头来看看怎么使用联合类型书写 `padLeft` 代码。我们可以像下面这样利用类型断言来写：
+
+```typescript
+function isNumber (x: any):x is string {
+  return typeof x === 'number'
+}
+
+function isString (x: any): x is string {
+  return typeof x === 'string'
+}
+
+function padLeft (value: string, padding: string | number) {
+  if (isNumber(padding)) {
+    return Array(padding + 1).join(' ') + value
+  }
+  if (isString(padding)) {
+    return padding + value
+  }
+  throw new Error(`Expected string or number, got '${padding}'.`)
+}
+```
+
+然而，你必须要定义一个函数来判断类型是否是原始类型，但这并不必要。其实我们不必将 `typeof x === 'number' `抽象成一个函数，因为 TypeScript 可以将它识别为一个类型保护。 也就是说我们可以直接在代码里检查类型了。
+
+
+```typescript
+function padLeft (value: string, padding: string | number) {
+  if (typeof padding === 'number') {
+    return Array(padding + 1).join(' ') + value
+  }
+  if (typeof padding === 'string') {
+    return padding + value
+  }
+  throw new Error(`Expected string or number, got '${padding}'.`)
+}
+```
+
+这些 `typeof` 类型保护只有两种形式能被识别：`typeof v === "typename"` 和 `typeof v !== "typename"`， `"typename"`必须是 `"number"`， `"string"`，`"boolean"` 或 `"symbol"`。 但是 TypeScript 并不会阻止你与其它字符串比较，只是 TypeScript 不会把那些表达式识别为类型保护。
+
+### instanceof 类型保护
+
+如果你已经阅读了 `typeof` 类型保护并且对 JavaScript 里的 `instanceof` 操作符熟悉的话，你可能已经猜到了这节要讲的内容。
+
+`instanceof` 类型保护是通过构造函数来细化类型的一种方式。我们把之前的例子做一个小小的改造：
+
+```typescript
+class Bird {
+  fly () {
+    console.log('bird fly')
+  }
+
+  layEggs () {
+    console.log('bird lay eggs')
+  }
+}
+
+class Fish {
+  swim () {
+    console.log('fish swim')
+  }
+
+  layEggs () {
+    console.log('fish lay eggs')
+  }
+}
+
+function getRandomPet () {
+  return Math.random() > 0.5 ? new Bird() : new Fish()
+}
+
+let pet = getRandomPet()
+
+if (pet instanceof Bird) {
+  pet.fly()
+}
+if (pet instanceof Fish) {
+  pet.swim()
+}
+```
+
+## 可以为 null 的类型
+
+TypeScript 具有两种特殊的类型，`null` 和 `undefined`，它们分别具有值 `null` 和 `undefined`。我们在[基础类型](/chapter2/type)一节里已经做过简要说明。 默认情况下，类型检查器认为 `null` 与 `undefined` 可以赋值给任何类型。 `null` 与 `undefined` 是所有其它类型的一个有效值。 这也意味着，你阻止不了将它们赋值给其它类型，就算是你想要阻止这种情况也不行。`null`的发明者，Tony Hoare，称它为[价值亿万美金的错误](https://en.wikipedia.org/wiki/Null_pointer#History)。
+
+`--strictNullChecks` 标记可以解决此错误：当你声明一个变量时，它不会自动地包含 `null` 或 `undefined`。 你可以使用联合类型明确的包含它们：
+
+```typescript
+let s = 'foo'
+s = null // 错误, 'null'不能赋值给'string'
+let sn: string | null = 'bar'
+sn = null // 可以
+
+sn = undefined // error, 'undefined'不能赋值给'string | null'
+```
+
+注意，按照 JavaScript 的语义，TypeScript 会把 `null` 和 `undefined` 区别对待。`string | null`，`string | undefined` 和 `string | undefined | null` 是不同的类型。
+
+### 可选参数和可选属性
+
+使用了 `--strictNullChecks`，可选参数会被自动地加上 `| undefined`:
+
+```typescript
+function f(x: number, y?: number) {
+  return x + (y || 0)
+}
+f(1, 2)
+f(1)
+f(1, undefined)
+f(1, null) // error, 'null' 不能赋值给 'number | undefined'
+```
+
+可选属性也会有同样的处理：
+
+```typescript
+class C {
+  a: number
+  b?: number
+}
+let c = new C()
+c.a = 12
+c.a = undefined // error, 'undefined' 不能赋值给 'number'
+c.b = 13
+c.b = undefined // ok
+c.b = null // error, 'null' 不能赋值给 'number | undefined'
+```
+
+### 类型保护和类型断言
+
+由于可以为 `null` 的类型能和其它类型定义为联合类型，那么你需要使用类型保护来去除 `null`。幸运地是这与在 `JavaScript` 里写的代码一致：
+
+```typescript
+function f(sn: string | null): string {
+  if (sn === null) {
+    return 'default'
+  } else {
+    return sn
+  }
+}
+```
+
+这里很明显地去除了 `null`，你也可以使用短路运算符：
+
+```typescript
+function f(sn: string | null): string {
+  return sn || 'default'
+}
+```
+
+如果编译器不能够去除 `null` 或 `undefined`，你可以使用类型断言手动去除。语法是添加 `!` 后缀： `identifier!` 从 `identifier` 的类型里去除了 `null` 和 `undefined`：
+
+```typescript
+function broken(name: string | null): string {
+  function postfix(epithet: string) {
+    return name.charAt(0) + '.  the ' + epithet // error, 'name' 可能为 null
+  }
+  name = name || 'Bob'
+  return postfix('great')
+}
+
+function fixed(name: string | null): string {
+  function postfix(epithet: string) {
+    return name!.charAt(0) + '.  the ' + epithet // ok
+  }
+  name = name || 'Bob'
+  return postfix('great')
+}
+
+broken(null)
+
+```
+
+本例使用了嵌套函数，因为编译器无法去除嵌套函数的 `null`（除非是立即调用的函数表达式）。因为它无法跟踪所有对嵌套函数的调用，尤其是你将内层函数做为外层函数的返回值。如果无法知道函数在哪里被调用，就无法知道调用时 `name` 的类型。
+
+## 字符串字面量类型
+
+字符串字面量类型允许你指定字符串必须具有的确切值。在实际应用中，字符串字面量类型可以与联合类型，类型保护很好的配合。通过结合使用这些特性，你可以实现类似枚举类型的字符串。
+
+```typescript
+type Easing = 'ease-in' | 'ease-out' | 'ease-in-out'
+
+class UIElement {
+  animate (dx: number, dy: number, easing: Easing) {
+    if (easing === 'ease-in') {
+      // ...
+    } else if (easing === 'ease-out') {
+    } else if (easing === 'ease-in-out') {
+    } else {
+      // error! 不能传入 null 或者 undefined.
+    }
+  }
+}
+
+let button = new UIElement()
+button.animate(0, 0, 'ease-in')
+button.animate(0, 0, 'uneasy') // error
+
+```
+
+你只能从三种允许的字符中选择其一来做为参数传递，传入其它值则会产生错误。
+
+```
+Argument of type '"uneasy"' is not assignable to parameter of type '"ease-in" | "ease-out" | "ease-in-out"'
+```
+
+## 总结
+
+那么到这里，我们的 TypeScript 常用语法学习就告一段落了，当然 TypeScript 还有其他的语法我们并没有讲，我们只是讲了 TypeScript 的一些常用语法，你们把这些知识学会已经足以开发一般的应用了。如果你在使用 TypeScript 开发项目中遇到了其他的 TypeScript 语法知识，你可以通过 TypeScript 的[官网文档](https://www.typescriptlang.org/docs/home.html)学习。因为学基础最好的方法还是去阅读它的官网文档，敲上面的小例子。其实我们课程的基础知识结构也是大部分参考了官网文档，要记住学习一门技术的基础官网文档永远是最好的第一手资料。
+
+但是 TypeScript 的学习不能仅仅靠看官网文档，你还需要动手实践，在实践中你才能真正掌握 TypeScript。相信很多同学学习到这里已经迫不及待想要大展身手了，那么下面我们就开始把理论转换为实践，一起来用 TypeScript 重构 axios 吧！
+
+
 
