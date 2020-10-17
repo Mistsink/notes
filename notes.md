@@ -32,8 +32,70 @@
    - `v-show` 就简单得多——不管初始条件是什么，**元素总是会被渲染，并且只是简单地基于 `CSS` 进行切换。**
 
    一般来说，**`v-if` 有更高的切换开销，而 `v-show` 有更高的初始渲染开销**。因此，如果需要非常频繁地切换，则使用 `v-show` 较好；如果在运行时条件很少改变，则使用 `v-if` 较好。
+   
+4. [基础组件的自动化全局注册](https://cn.vuejs.org/v2/guide/components-registration.html#基础组件的自动化全局注册)
 
+   如果你恰好使用了 `webpack` (或在内部使用了 `webpack` 的 [Vue CLI 3+](https://github.com/vuejs/vue-cli))，那么就可以使用 `require.context` 只全局注册这些非常通用的基础组件。这里有一份可以让你在应用入口文件 (比如 `src/main.js`) 中全局导入基础组件的示例代码：
 
+   ```js
+   import Vue from 'vue'
+   import upperFirst from 'lodash/upperFirst'
+   import camelCase from 'lodash/camelCase'
+   
+   const requireComponent = require.context(
+     // 其组件目录的相对路径
+     './components',
+     // 是否查询其子目录
+     false,
+     // 匹配基础组件文件名的正则表达式
+     /Base[A-Z]\w+\.(vue|js)$/
+   )
+   
+   requireComponent.keys().forEach(fileName => {
+     // 获取组件配置
+     const componentConfig = requireComponent(fileName)
+   
+     // 获取组件的 PascalCase 命名
+     const componentName = upperFirst(
+       camelCase(
+         // 获取和目录深度无关的文件名
+         fileName
+           .split('/')
+           .pop()
+           .replace(/\.\w+$/, '')
+       )
+     )
+   
+     // 全局注册组件
+     Vue.component(
+       componentName,
+       // 如果这个组件选项是通过 `export default` 导出的，
+       // 那么就会优先使用 `.default`，
+       // 否则回退到使用模块的根。
+       componentConfig.default || componentConfig
+     )
+   })
+   ```
+
+5. ###### [Prop 的大小写 (camelCase vs kebab-case)](https://cn.vuejs.org/v2/guide/components-props.html#Prop-的大小写-camelCase-vs-kebab-case)
+
+   HTML 中的 attribute 名是大小写不敏感的，所以浏览器会把所有大写字符解释为小写字符。这意味着当你使用 DOM 中的模板时，`camelCase `(驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名：
+
+   ```js
+   Vue.component('blog-post', {
+     // 在 JavaScript 中是 camelCase 的
+     props: ['postTitle'],
+     template: '<h3>{{ postTitle }}</h3>'
+   })
+   <!-- 在 HTML 中是 kebab-case 的 -->
+   <blog-post post-title="hello!"></blog-post>
+   ```
+
+   重申一次，如果你使用字符串模板，那么这个限制就不存在了。
+
+6. ###### [替换/合并已有的 Attribute](https://cn.vuejs.org/v2/guide/components-props.html#替换-合并已有的-Attribute)
+
+   对于绝大多数 attribute 来说，从外部提供给组件的值会替换掉组件内部设置好的值。所以如果传入 `type="text"` 就会替换掉 `type="date"` 并把它破坏！庆幸的是，`class` 和 `style` attribute 会稍微智能一些，即两边的值会被合并起来，从而得到最终的值：`form-control date-picker-theme-dark`。
 
 
 
@@ -56,8 +118,14 @@
 1. `axios`访问不到本地的文件：
    **A:** 在`vue-cli`升级至@3+后，静态文件放在public文件夹下，故请求的根路径变成了：  http://localhost:8080/public/api
    记得将静态文件放在public下，而不再是static
+   
+2. vue/cli创建项目时报错：Failed to check for updates，且导致项目创建失败
 
+   **A：**找到`.vuerc`文件，查看详细信息：
 
+   - 淘宝镜像源是否启用
+   - 包管理工具是npm还是yarn
+   - vue/cli内置的包管理是yarn，yarn又是hadoop集群的资源管理系统，故查看是否是系统变量中hadoop的变量路径导致vue/cli使用了hadoop的yarn
 
 
 
